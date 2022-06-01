@@ -66,6 +66,6 @@ func main() {
 	flag.StringVar(&outputFile, "output", "", "output file, default STDOUT")
 	flag.Parse()
 	if err := run(); err != nil {
-		log.Fatal("cvs2avro failed: %s", err)
+		log.Fatalf("cvs2avro failed: %s", err)
 	}
 }
