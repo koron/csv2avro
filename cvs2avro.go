@@ -9,13 +9,13 @@ import (
 	"github.com/hamba/avro"
 )
 
-type converter interface {
-	convert(string) (interface{}, error)
+type Converter interface {
+	Convert(string) (interface{}, error)
 }
 
 type fieldConverter struct {
 	name string
-	conv converter
+	conv Converter
 }
 
 func newFieldConverter(*avro.Field) (fieldConverter, error) {
@@ -47,7 +47,7 @@ func (cv *recordConverter) Convert(src []string) (map[string]interface{}, error)
 			return nil, fmt.Errorf("no field converters provided at column #%d", i)
 		}
 		fc := cv.fieldConvs[i]
-		v, err := fc.conv.convert(s)
+		v, err := fc.conv.Convert(s)
 		if err != nil {
 			return nil, err
 		}
