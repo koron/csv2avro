@@ -1,0 +1,10 @@
+{
+  "type": "record",
+  "namespace": "net.kaoriya.csv2avro",
+  "name": "test",
+  "fields": [
+    { "name": "label", "type": "string" },
+    { "name": "id", "type": "int" },
+    { "name": "value", "type": "int" }
+  ]
+}

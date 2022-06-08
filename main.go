@@ -17,6 +17,9 @@ var (
 )
 
 func loadSchema() (avro.Schema, error) {
+	if schemaFile == "" {
+		return nil, fmt.Errorf("no schema specified")
+	}
 	return avro.ParseFiles(schemaFile)
 }
 
@@ -37,7 +40,7 @@ func openOutput() (io.Writer, error) {
 func run() error {
 	sch, err := loadSchema()
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to load schema: %w", err)
 	}
 	recSch, ok := sch.(*avro.RecordSchema)
 	if !ok {
@@ -66,6 +69,6 @@ func main() {
 	flag.StringVar(&outputFile, "output", "", "output file, default STDOUT")
 	flag.Parse()
 	if err := run(); err != nil {
-		log.Fatalf("cvs2avro failed: %s", err)
+		log.Fatalf("csv2avro failed: %s", err)
 	}
 }

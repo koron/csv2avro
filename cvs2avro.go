@@ -25,75 +25,56 @@ type fieldConverter struct {
 	conv Converter
 }
 
-func newFieldConverter(f *avro.Field) (fieldConverter, error) {
-	switch f.Type().Type() {
+func newConverter(sch avro.Schema) (Converter, error) {
+	switch sch.Type() {
 	case avro.String:
-		return fieldConverter{
-			name: "string",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return s, nil
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			return s, nil
+		}), nil
 
 	case avro.Int:
-		return fieldConverter{
-			name: "int",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return strconv.ParseInt(s, 10, 32)
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			v, err := strconv.ParseInt(s, 10, 32)
+			return int(v), err
+		}), nil
 
 	case avro.Long:
-		return fieldConverter{
-			name: "long",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return strconv.ParseInt(s, 10, 64)
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			return strconv.ParseInt(s, 10, 64)
+		}), nil
 
 	case avro.Float:
-		return fieldConverter{
-			name: "float",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return strconv.ParseFloat(s, 32)
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			v, err := strconv.ParseFloat(s, 32)
+			return float32(v), err
+		}), nil
 
 	case avro.Double:
-		return fieldConverter{
-			name: "double",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return strconv.ParseFloat(s, 64)
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			return strconv.ParseFloat(s, 64)
+		}), nil
 
 	case avro.Boolean:
-		return fieldConverter{
-			name: "bool",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return strconv.ParseBool(s)
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			return strconv.ParseBool(s)
+		}), nil
 
 	case avro.Null:
-		return fieldConverter{
-			name: "null",
-			conv: convertFunc(func(s string) (interface{}, error) {
-				return nil, nil
-			}),
-		}, nil
+		return convertFunc(func(s string) (interface{}, error) {
+			return nil, nil
+		}), nil
 
 	default:
-		return fieldConverter{}, fmt.Errorf("unsupported type: %s", f.Type().Type())
-	//case avro.Record:
-	//case avro.Error:
-	//case avro.Ref:
-	//case avro.Enum:
-	//case avro.Array:
-	//case avro.Map:
-	//case avro.Union:
-	//case avro.Fixed:
-	//case avro.Bytes:
+		return nil, fmt.Errorf("unsupported type: %s", sch.Type())
+		//case avro.Record:
+		//case avro.Error:
+		//case avro.Ref:
+		//case avro.Enum:
+		//case avro.Array:
+		//case avro.Map:
+		//case avro.Union:
+		//case avro.Fixed:
+		//case avro.Bytes:
 	}
 }
 
@@ -105,11 +86,14 @@ func newRecordConverter(recSch *avro.RecordSchema) (*recordConverter, error) {
 	fields := recSch.Fields()
 	convs := make([]fieldConverter, 0, len(fields))
 	for _, f := range fields {
-		fc, err := newFieldConverter(f)
+		c, err := newConverter(f.Type())
 		if err != nil {
 			return nil, err
 		}
-		convs = append(convs, fc)
+		convs = append(convs, fieldConverter{
+			name: f.Name(),
+			conv: c,
+		})
 	}
 	return &recordConverter{fieldConvs: convs}, nil
 }
@@ -127,7 +111,7 @@ func (cv *recordConverter) Convert(src []string) (map[string]interface{}, error)
 		}
 		dst[fc.name] = v
 	}
-	return nil, nil
+	return dst, nil
 }
 
 func csv2avro(recSch *avro.RecordSchema, in io.Reader, out io.Writer) error {
@@ -151,7 +135,7 @@ func csv2avro(recSch *avro.RecordSchema, in io.Reader, out io.Writer) error {
 		// compose an record.
 		dst, err := cv.Convert(src)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to convert values: %w", err)
 		}
 		if dst == nil {
 			continue
@@ -159,7 +143,7 @@ func csv2avro(recSch *avro.RecordSchema, in io.Reader, out io.Writer) error {
 		// output an record as Avro.
 		err = w.Encode(dst)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to encode: %w", err)
 		}
 	}
 	return nil
