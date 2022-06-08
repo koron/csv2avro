@@ -1,4 +1,4 @@
-module github.com/koron/cvs2avro
+module github.com/koron/csv2avro
 
 go 1.18
 
