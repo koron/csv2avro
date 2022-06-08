@@ -13,7 +13,7 @@ $ go install github.com/koron/csv2avro@latest
 ## Usage
 
 ```console
-$ ./csv2avro -schema {SCHEMA} [-input {INPUT}] -output [OUTPUT]
+$ csv2avro -schema {SCHEMA} [-input {INPUT}] -output [OUTPUT]
 ```
 
 * `SCHEMA`: AVRO schema, mandatory
@@ -23,7 +23,7 @@ $ ./csv2avro -schema {SCHEMA} [-input {INPUT}] -output [OUTPUT]
 Example:
 
 ```console
-$ ./csv2avro -schema my_shcema.avsc < input.csv > output.avro
+$ csv2avro -schema my_shcema.avsc < input.csv > output.avro
 ```
 
 ## Supported Avro's types
@@ -36,10 +36,11 @@ $ ./csv2avro -schema my_shcema.avsc < input.csv > output.avro
 * `boolean`
 * `null` - always null.
 
-## Misc
+## Misc for development
 
 Test command:
 
 ```console
+$ go build
 $ ./csv2avro -schema testdata/sample1.avsc -input testdata/sample1.csv -output testdata/sample1.avro
 ```
