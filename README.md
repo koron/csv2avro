@@ -13,7 +13,7 @@ $ go install github.com/koron/csv2avro@latest
 ## Usage
 
 ```console
-$ csv2avro -schema {SCHEMA} [-input {INPUT}] -output [OUTPUT]
+$ csv2avro -schema {SCHEMA} [-input {INPUT}] [-output {OUTPUT}]
 ```
 
 * `SCHEMA`: AVRO schema, mandatory
