@@ -12,6 +12,20 @@ $ go install github.com/koron/csv2avro@latest
 
 ## Usage
 
+```console
+$ ./csv2avro -schema {SCHEMA} [-input {INPUT}] -output [OUTPUT]
+```
+
+* `SCHEMA`: AVRO schema, mandatory
+* `INPUT`: optional, default is STDIN
+* `OUTPUT`: optional, default is STDOUT
+
+Example:
+
+```console
+$ ./csv2avro -schema my_shcema.avsc < input.csv > output.avro
+```
+
 ## Supported Avro's types
 
 * `string`
