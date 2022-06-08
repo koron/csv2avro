@@ -1,7 +1,7 @@
 {
   "type": "record",
-  "namespace": "net.kaoriya.csv2avro",
-  "name": "test",
+  "namespace": "net.kaoriya.csv2avro.test",
+  "name": "sample1",
   "fields": [
     { "name": "label", "type": "string" },
     { "name": "id", "type": "int" },
