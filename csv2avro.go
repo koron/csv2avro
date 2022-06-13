@@ -114,14 +114,13 @@ func (cv *recordConverter) Convert(src []string) (map[string]interface{}, error)
 	return dst, nil
 }
 
-func csv2avro(recSch *avro.RecordSchema, in io.Reader, out io.Writer) error {
+func csv2avro(recSch *avro.RecordSchema, r *csv.Reader, out io.Writer) error {
 	// generate value converters from avro.Schema
 	cv, err := newRecordConverter(recSch)
 	if err != nil {
 		return err
 	}
 	w := avro.NewEncoderForSchema(recSch, out)
-	r := csv.NewReader(in)
 	// FIXME: configure CSV reader.
 	for {
 		// read a row from CSV/TSV.

@@ -13,17 +13,25 @@ $ go install github.com/koron/csv2avro@latest
 ## Usage
 
 ```console
-$ csv2avro -schema {SCHEMA} [-input {INPUT}] [-output {OUTPUT}]
+$ csv2avro -schema {SCHEMA} [-input {INPUT}] [-output {OUTPUT}] [OPTIONS]
 ```
 
 * `SCHEMA`: AVRO schema, mandatory
 * `INPUT`: optional, default is STDIN
+    It will be treated as TSV when a file name ends with ".tsv".
+    Otherwise it is treated as CSV.
 * `OUTPUT`: optional, default is STDOUT
+
+Other options:
+
+* `-tsv` Force input as TSV.
 
 Example:
 
 ```console
 $ csv2avro -schema my_shcema.avsc < input.csv > output.avro
+
+$ csv2avro -schema my_shcema.avsc -tsv < input.tsv > output.avro
 ```
 
 ## Supported Avro's types
