@@ -80,6 +80,7 @@ func newConverter(sch avro.Schema) (Converter, error) {
 
 type recordConverter struct {
 	fieldConvs []fieldConverter
+	detection  bool
 }
 
 func newRecordConverter(recSch *avro.RecordSchema) (*recordConverter, error) {
@@ -95,10 +96,44 @@ func newRecordConverter(recSch *avro.RecordSchema) (*recordConverter, error) {
 			conv: c,
 		})
 	}
-	return &recordConverter{fieldConvs: convs}, nil
+	return &recordConverter{
+		fieldConvs: convs,
+		detection:  true,
+	}, nil
+}
+
+// detectHeader checks all labels are in fields, and sort fieldConvs in order
+// of labels.
+func (cv *recordConverter) detectHeader(labels []string) bool {
+	m := map[string]fieldConverter{}
+	for _, fc := range cv.fieldConvs {
+		m[fc.name] = fc
+	}
+
+	newConvs := make([]fieldConverter, 0, len(labels))
+	for _, s := range labels {
+		fc, ok := m[s]
+		if !ok {
+			//log.Printf("field not found: %s", s)
+			return false
+		}
+		newConvs = append(newConvs, fc)
+	}
+	cv.fieldConvs = newConvs
+	return true
 }
 
 func (cv *recordConverter) Convert(src []string) (map[string]interface{}, error) {
+	if cv.detection {
+		cv.detection = false
+		if ok := cv.detectHeader(src); ok {
+			return nil, nil
+		}
+	}
+	return cv.convert(src)
+}
+
+func (cv *recordConverter) convert(src []string) (map[string]interface{}, error) {
 	dst := map[string]interface{}{}
 	for i, s := range src {
 		if i >= len(cv.fieldConvs) {
@@ -121,13 +156,12 @@ func csv2avro(recSch *avro.RecordSchema, r *csv.Reader, out io.Writer) error {
 		return err
 	}
 	w := avro.NewEncoderForSchema(recSch, out)
-	// FIXME: configure CSV reader.
 	for {
 		// read a row from CSV/TSV.
 		src, err := r.Read()
 		if err != nil {
 			if errors.Is(err, io.EOF) {
-				break
+				return nil
 			}
 			return err
 		}
@@ -145,5 +179,4 @@ func csv2avro(recSch *avro.RecordSchema, r *csv.Reader, out io.Writer) error {
 			return fmt.Errorf("failed to encode: %w", err)
 		}
 	}
-	return nil
 }
