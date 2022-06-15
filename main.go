@@ -1,14 +1,10 @@
 package main
 
 import (
-	"encoding/csv"
 	"flag"
 	"fmt"
 	"io"
 	"log"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/hamba/avro"
 )
@@ -20,45 +16,8 @@ var (
 	forceTSV   bool
 )
 
-func loadSchema() (avro.Schema, error) {
-	if schemaFile == "" {
-		return nil, fmt.Errorf("no schema specified")
-	}
-	return avro.ParseFiles(schemaFile)
-}
-
-func openInput() (io.Reader, io.Closer, error) {
-	if inputFile == "" {
-		return os.Stdin, nil, nil
-	}
-	f, err := os.Open(inputFile)
-	if err != nil {
-		return nil, nil, err
-	}
-	return f, f, nil
-}
-
-func openCSVReader() (*csv.Reader, io.Closer, error) {
-	in, c, err := openInput()
-	if err != nil {
-		return nil, nil, err
-	}
-	r := csv.NewReader(in)
-	if forceTSV || strings.ToLower(filepath.Ext(inputFile)) == ".tsv" {
-		r.Comma = '\t'
-	}
-	return r, c, nil
-}
-
-func openOutput() (io.Writer, error) {
-	if outputFile == "" {
-		return os.Stdout, nil
-	}
-	return os.Create(outputFile)
-}
-
 func run() error {
-	sch, err := loadSchema()
+	sch, err := loadSchema(schemaFile)
 	if err != nil {
 		return fmt.Errorf("failed to load schema: %w", err)
 	}
@@ -67,7 +26,7 @@ func run() error {
 		return fmt.Errorf("type of root schema isn't record: %s", schemaFile)
 	}
 
-	in, rc, err := openCSVReader()
+	in, rc, err := openCSVReader(inputFile, forceTSV)
 	if err != nil {
 		return err
 	}
@@ -75,7 +34,7 @@ func run() error {
 		defer rc.Close()
 	}
 
-	out, err := openOutput()
+	out, err := openOutput(outputFile)
 	if err != nil {
 		return err
 	}
