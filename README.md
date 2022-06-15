@@ -4,11 +4,18 @@
 [![Actions/Go](https://github.com/koron/csv2avro/workflows/Go/badge.svg)](https://github.com/koron/csv2avro/actions?query=workflow%3AGo)
 [![Go Report Card](https://goreportcard.com/badge/github.com/koron/csv2avro)](https://goreportcard.com/report/github.com/koron/csv2avro)
 
+Convert CSV/TSV file to AVRO file.
+
 ## How to install
 
 ```console
 $ go install github.com/koron/csv2avro@latest
 ```
+
+## Features
+
+* Detect CSV or TSV by extension of file name
+* Auto detect a header row
 
 ## Usage
 
