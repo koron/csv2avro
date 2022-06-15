@@ -18,6 +18,18 @@ func loadSchema(name string) (avro.Schema, error) {
 	return avro.ParseFiles(name)
 }
 
+func loadRecordSchema(name string) (*avro.RecordSchema, error) {
+	sch, err := loadSchema(name)
+	if err != nil {
+		return nil, err
+	}
+	rsch, ok := sch.(*avro.RecordSchema)
+	if !ok {
+		return nil, fmt.Errorf("root schema isn't record: %s", name)
+	}
+	return rsch, nil
+}
+
 func openInput(name string) (io.Reader, io.Closer, error) {
 	if name == "" {
 		return os.Stdin, nil, nil

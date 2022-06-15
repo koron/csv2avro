@@ -5,8 +5,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-
-	"github.com/hamba/avro"
 )
 
 var (
@@ -17,13 +15,9 @@ var (
 )
 
 func run() error {
-	sch, err := loadSchema(schemaFile)
+	sch, err := loadRecordSchema(schemaFile)
 	if err != nil {
 		return fmt.Errorf("failed to load schema: %w", err)
-	}
-	recSch, ok := sch.(*avro.RecordSchema)
-	if !ok {
-		return fmt.Errorf("type of root schema isn't record: %s", schemaFile)
 	}
 
 	in, rc, err := openCSVReader(inputFile, forceTSV)
@@ -42,7 +36,7 @@ func run() error {
 		defer c.Close()
 	}
 
-	return csv2avro(recSch, in, out)
+	return csv2avro(sch, in, out)
 }
 
 func main() {
