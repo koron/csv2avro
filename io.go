@@ -47,6 +47,7 @@ func openCSVReader(name string, forceTSV bool) (*csv.Reader, io.Closer, error) {
 		return nil, nil, err
 	}
 	r := csv.NewReader(in)
+	r.LazyQuotes = true
 	if forceTSV || strings.ToLower(filepath.Ext(name)) == ".tsv" {
 		r.Comma = '\t'
 	}
