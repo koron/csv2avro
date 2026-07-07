@@ -2,7 +2,6 @@
 
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/koron/csv2avro)](https://pkg.go.dev/github.com/koron/csv2avro)
 [![Actions/Go](https://github.com/koron/csv2avro/workflows/Go/badge.svg)](https://github.com/koron/csv2avro/actions?query=workflow%3AGo)
-[![Go Report Card](https://goreportcard.com/badge/github.com/koron/csv2avro)](https://goreportcard.com/report/github.com/koron/csv2avro)
 
 Convert CSV/TSV file to AVRO file.
 
