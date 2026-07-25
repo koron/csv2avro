@@ -2,7 +2,7 @@ module github.com/koron/csv2avro
 
 go 1.18
 
-require github.com/hamba/avro v1.7.0
+require github.com/hamba/avro v1.8.0
 
 require (
 	github.com/json-iterator/go v1.1.12 // indirect
